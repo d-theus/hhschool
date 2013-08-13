@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<head>
+	<meta charset="utf8">
+	<script src="./jquery.js"></script>
+	<script src="./calendar.js" lang="us" charset="utf8"></script>
+	<link rel="stylesheet" type="text/css" href="index.css">
+	<title>Calendar</title>
+</head>
+<body>
+<div class="bar">
+	<h1 id="heading">Calendar by Andrew D</h1>
+	<div class="row">
+		<div class="button-group">
+			<input type="button" name="some_name" value="Добавить">
+			<input type="button" name="some_name" value="Обновить">
+		</div>
+		<div class="search-form">
+			<input id="search-input" type="text" name="some_name" placeholder="События, дата или участники" size="30">
+		</div>
+	</div>
+</div>
+<div class="calendar">
+	<div class="calendar-control">
+	<input id="prev-month" type="button" name="next" value="<">
+	<span id="month"></span>
+	<input id="next-month" type="button" name="prev" value=">">
+	</div>
+	<table id="calendar">
+	</table>
+</div>
+</body>

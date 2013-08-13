@@ -1,0 +1,28 @@
+.bar{
+	background: lightgray;
+	height: 100px;
+}
+#calendar{
+	border-collapse: collapse;
+}
+.day{
+	text-align: left;
+	border: 1px solid grey;
+	padding: 4px;
+	width: 100px;
+	height: 100px;
+	vertical-align: top;
+}
+
+.today{
+	background-color: lightgray;
+}
+
+.button-group{
+	float: left;
+}
+.search-form{
+	float: right;
+	margin-right: 20px;
+}
+
