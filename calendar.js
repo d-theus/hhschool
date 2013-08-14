@@ -4,6 +4,26 @@ today = new Date();
 month = today.getMonth();
 year = today.getFullYear();
 
+cevent = {
+	date: {},
+	title: "",
+	desc: "",
+	people: [],
+	create: function(date, title, desc, people) {
+		var res = $.extend(true, {}, this);
+		res.date = date;
+		res.title = title;
+		res.desc = desc || "";
+		res.people = people || [];
+		return res;
+	}
+}
+
+test_events = [ cevent.create(new Date(), "oneone"), cevent.create(new Date(), "twowo") ]
+localStorage.setItem("cevents", JSON.stringify(test_events));
+cevents = JSON.parse(localStorage["cevents"]);
+
+
 function clone(obj) {
 	return $.extend(true, {}, obj);
 }
@@ -66,6 +86,48 @@ function decMonth () {
 	fill_calendar(dates_eq(today,nd) ? today : nd);
 }
 
+function popupGen(popup,par){
+	$(".popup-arrow").remove();
+	var pos = par.position();
+	popup.css({ "display":"block"});
+
+	popup.find(".popup-close").on("click",function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		$(this).closest(".popup").css({"display":"none"});
+		$(".popup-arrow").remove();
+	});
+}
+
+function popupUnder (popup,par) {
+	popupGen(popup,par);
+	var pos = par.position();
+	popup.css({
+		"top":pos.top+par.height()*1.3,
+		"left":pos.left+par.width()*0.5});
+
+	popup.parent().append('<div class="popup-arrow popup-arrow-up"></div>');
+
+	$(".popup-arrow").css({
+		"top":popup.position().top - 4,
+		"left":popup.position().left + 2,
+		"display":"block"});
+}
+function popupRight (popup,par) {
+	popupGen(popup,par);
+	var pos = par.position();
+	popup.css({
+		"top":pos.top+par.height()/2 - popup.height()/2,
+		"left":pos.left+par.width()*1.2});
+
+	popup.parent().append('<div class="popup-arrow popup-arrow-left"></div>');
+
+	$(".popup-arrow").css({
+		"top":popup.position().top + popup.height()/2,
+		"left": popup.position().left - 4, 
+		"display":"block"});
+}
+
 
 $(document).ready(function() {
 
@@ -74,6 +136,15 @@ $(document).ready(function() {
 	});
 	$("#prev-month").on("click",function() {
 		decMonth();
+	});
+	$("#today-button").on("click",function() {
+		popupRight($("#testpopup"),$(this));
+	});
+	$("#prev-month").on("click",function() {
+		popupRight($("#testpopup"),$(this));
+	});
+	$("#next-month").on("click",function() {
+		popupUnder($("#testpopup"),$(this));
 	});
 
 	fill_calendar(today);
