@@ -54,20 +54,32 @@
 	-ms-transform: rotate(-45deg);
 }
 
-.row {
-	float: left;
-	margin: 0 0 ;
-}
-.row *{
-	float: left;
-}
 .popup-close{
 	text-decoration: none;
 	color: gray;
+	margin: 10px;
+	margin-top: 0px;
+}
+
+.row {
+	clear: both;
+	display: block;
+	margin: 0 0 ;
 }
 .left{
 	float: left;
 }
 .right{
 	float: right;
+}
+.col *{
+	display: block;
+}
+
+fieldset{
+	border-width: 0px;
+}
+
+#day-popup-desc{
+	margin: 0px 10px;
 }

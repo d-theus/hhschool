@@ -1,17 +1,16 @@
-var dows=["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"];
-var months = ["Январь", "Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь" ];
+dows=["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"];
+months = ["Январь", "Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь" ];
+months_s = ["января", "февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря" ];
 today = new Date();
 month = today.getMonth();
 year = today.getFullYear();
 
 cevent = {
-	date: {},
 	title: "",
 	desc: "",
 	people: [],
-	create: function(date, title, desc, people) {
+	create: function(title, desc, people) {
 		var res = $.extend(true, {}, this);
-		res.date = date;
 		res.title = title;
 		res.desc = desc || "";
 		res.people = people || [];
@@ -19,7 +18,10 @@ cevent = {
 	}
 }
 
-test_events = [ cevent.create(new Date(), "oneone"), cevent.create(new Date(), "twowo") ]
+test_events = new Object();
+test_events[(new Date(2013,8,8)).toDateString()] =  cevent.create("oneone", "", ["me", "also me"]);
+test_events[(new Date(2013,8,14)).toDateString()] = cevent.create("twowo", "", ["not me", "ehh"])
+
 localStorage.setItem("cevents", JSON.stringify(test_events));
 cevents = JSON.parse(localStorage["cevents"]);
 
@@ -31,11 +33,18 @@ function clone(obj) {
 function mktag (tag) {
 	return $("<"+tag+"></"+tag+">");
 }
+function mktagcontent(tag,content){
+	return $("<"+tag+">"+content+"</"+tag+">");
+}
 
 function dates_eq(d1,d2){
 	return d1.getFullYear()==d2.getFullYear() &&
 		d1.getMonth()==d2.getMonth() &&
 		d1.getDate()==d2.getDate();
+}
+
+function find_events_by_date (date) {
+	return cevents[date.toDateString()];
 }
 
 function fill_calendar(d){
@@ -54,17 +63,43 @@ function fill_calendar(d){
 	$("#calendar tbody").append(mktag("tr"));
 	while(i < dayCount){
 		var dow = i < 7 ? dows[i]+", " : "";
-		var td = mktag("td").append(dow+day.getDate()).addClass("day");;
+		var td = mktag("td").append(dow+day.getDate()).addClass("day");
 		if(dates_eq(today, day)){
 			td.addClass("today");
 		}
-		day.setDate(day.getDate() +1);
 		if(i%7 == 0 && i > 0){
 			$("#calendar").append(mktag("tr"));
 
 		}
+		td.data("date",JSON.stringify(day.toString()));
+		var ev = find_events_by_date(day);
+		if(ev != null && ev != undefined){
+			td.data("ev",JSON.stringify(ev));
+			var ppl = (ev.people instanceof Array) ? ev.people.join() : ev.people;
+			td.append(mktagcontent( "p", ev.title+"</br>"+ ppl));
+			td.on("click", function() {
+				var td = $(this).closest(".day");
+				var ev = JSON.parse(td.data("ev"));
+				var date = new Date(JSON.parse(td.data("date"))) ;
+				var dpp = $("#day-popup");
+				dpp.find("#title").text(ev.title);
+				dpp.find("#date").text(date.getDate().toString() + " " + months_s[date.getMonth()]);
+				dpp.data("date",td.data("date"));
+				popupRight($("#day-popup"),$(this));
+			});
+		}else{
+			td.on("click", function() {
+				var td = $(this).closest(".day");
+				var date = new Date(JSON.parse(td.data("date"))) ;
+				var dpp = $("#new-day-popup");
+				dpp.find("#date").text(date.getDate().toString() + " " + months_s[date.getMonth()]);
+				dpp.data("date",td.data("date"));
+				popupRight($("#new-day-popup"),$(this));
+			});
+		}
 		$("#calendar tr:last").append(td);
 		i++;
+		day.setDate(day.getDate() +1);
 	}
 	$("#month").html(months[d.getMonth()]+" "+d.getFullYear());
 }
@@ -88,6 +123,7 @@ function decMonth () {
 
 function popupGen(popup,par){
 	$(".popup-arrow").remove();
+	$(".popup").hide();
 	var pos = par.position();
 	popup.css({ "display":"block"});
 
@@ -128,6 +164,10 @@ function popupRight (popup,par) {
 		"display":"block"});
 }
 
+function valid_event(ev) {
+return ev.title != null && ev.title.length > 0;
+}
+
 
 $(document).ready(function() {
 
@@ -138,13 +178,29 @@ $(document).ready(function() {
 		decMonth();
 	});
 	$("#today-button").on("click",function() {
-		popupRight($("#testpopup"),$(this));
+		fill_calendar(today);
+		$(".today").trigger("click");
 	});
-	$("#prev-month").on("click",function() {
-		popupRight($("#testpopup"),$(this));
+	$("#new-day-popup").on("click","#done",function() {
+		var ppp = $(this).closest("#new-day-popup");
+		var date = new Date(ppp.data("date"));
+		ev = cevent.create(
+				ppp.find("#ititle").val(),
+				ppp.find("#idesc").val(),
+				ppp.find("#ipeople").val()
+				);
+		if (valid_event(ev)){
+			cevents[date.toDateString()] = ev;
+		}else{
+			alert("Некоторые важные поля не заполнены");
+			return false;
+		}
+		localStorage.setItem("cevents",JSON.stringify(cevents));
+		ppp.find(".popup-close").trigger("click");
+		fill_calendar(date);
 	});
-	$("#next-month").on("click",function() {
-		popupUnder($("#testpopup"),$(this));
+	$("#new-day-popup").on("click","#remove",function() {
+		alert("okay remove");
 	});
 
 	fill_calendar(today);
