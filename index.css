@@ -1,6 +1,11 @@
-.bar{
+
+.heading{
 	background: lightgray;
 	height: 100px;
+}
+.body{
+	margin-left: auto;
+	margin-right: auto;
 }
 #calendar{
 	border-collapse: collapse;

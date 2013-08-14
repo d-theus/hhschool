@@ -16,11 +16,12 @@ cevent = {
 		res.people = people || [];
 		return res;
 	}
-}
+
+};
 
 test_events = new Object();
 test_events[(new Date(2013,8,8)).toDateString()] =  cevent.create("oneone", "", ["me", "also me"]);
-test_events[(new Date(2013,8,14)).toDateString()] = cevent.create("twowo", "", ["not me", "ehh"])
+test_events[(new Date(2013,8,14)).toDateString()] = cevent.create("twowo", "", ["not me", "ehh"]);
 
 localStorage.setItem("cevents", JSON.stringify(test_events));
 cevents = JSON.parse(localStorage["cevents"]);
@@ -33,6 +34,7 @@ function clone(obj) {
 function mktag (tag) {
 	return $("<"+tag+"></"+tag+">");
 }
+
 function mktagcontent(tag,content){
 	return $("<"+tag+">"+content+"</"+tag+">");
 }
@@ -45,6 +47,11 @@ function dates_eq(d1,d2){
 
 function find_events_by_date (date) {
 	return cevents[date.toDateString()];
+}
+
+function people_helper(ppl){
+	if (ppl == null || ppl === undefined) return null;
+	return (ppl instanceof Array) ? ppl.join() : ppl;
 }
 
 function fill_calendar(d){
@@ -73,30 +80,47 @@ function fill_calendar(d){
 		}
 		td.data("date",JSON.stringify(day.toString()));
 		var ev = find_events_by_date(day);
-		if(ev != null && ev != undefined){
+		if (ev !== undefined){
 			td.data("ev",JSON.stringify(ev));
-			var ppl = (ev.people instanceof Array) ? ev.people.join() : ev.people;
+			var ppl = people_helper(ev.people);
 			td.append(mktagcontent( "p", ev.title+"</br>"+ ppl));
-			td.on("click", function() {
-				var td = $(this).closest(".day");
-				var ev = JSON.parse(td.data("ev"));
-				var date = new Date(JSON.parse(td.data("date"))) ;
-				var dpp = $("#day-popup");
-				dpp.find("#title").text(ev.title);
-				dpp.find("#date").text(date.getDate().toString() + " " + months_s[date.getMonth()]);
-				dpp.data("date",td.data("date"));
-				popupRight($("#day-popup"),$(this));
-			});
-		}else{
-			td.on("click", function() {
-				var td = $(this).closest(".day");
-				var date = new Date(JSON.parse(td.data("date"))) ;
-				var dpp = $("#new-day-popup");
-				dpp.find("#date").text(date.getDate().toString() + " " + months_s[date.getMonth()]);
-				dpp.data("date",td.data("date"));
-				popupRight($("#new-day-popup"),$(this));
-			});
+		} else{
+			td.data("ev",JSON.stringify({}));
 		}
+		td.on("click", function() {
+			var td = $(this).closest(".day");
+			var ev = JSON.parse(td.data("ev")) || cevent.create();
+			var date = new Date(JSON.parse(td.data("date"))) ;
+			var dpp = $("#day-popup");
+			if ( ev.title == null){
+				dpp.find("#title").hide();
+				dpp.find("#ititle").show();
+			}else{
+				dpp.find("#title").text(ev.title);
+				dpp.find("#title").show();
+				dpp.find("#ititle").hide();
+			}
+			if( ev.people == null){
+				dpp.find("#people").hide();
+				dpp.find("#ipeople").show();
+			}else{
+				dpp.find("#l-people").text(people_helper(ev.people));
+				dpp.find("#people").show();
+				dpp.find("#ipeople").hide();
+			}
+			if (ev.desc == null) {
+				dpp.find("#desc").hide();
+				dpp.find("#idesc").show();
+			}
+			else{
+				dpp.find("#desc").show();
+				dpp.find("#l-desc").text(ev.desc);
+				dpp.find("#idesc").hide();
+			}
+			dpp.find("#date").text(date.getDate().toString() + " " + months_s[date.getMonth()]);
+			dpp.data("date",td.data("date"));
+			popupRight($("#day-popup"),$(this));
+		});
 		$("#calendar tr:last").append(td);
 		i++;
 		day.setDate(day.getDate() +1);
@@ -112,6 +136,7 @@ function incMonth () {
 	var nd = new Date(year, month, 1);
 	fill_calendar(dates_eq(today,nd) ? today : nd);
 }
+
 function decMonth () {
 	if (month == 0) {
 		year--;
@@ -168,7 +193,6 @@ function valid_event(ev) {
 return ev.title != null && ev.title.length > 0;
 }
 
-
 $(document).ready(function() {
 
 	$("#next-month").on("click",function() {
@@ -181,14 +205,24 @@ $(document).ready(function() {
 		fill_calendar(today);
 		$(".today").trigger("click");
 	});
-	$("#new-day-popup").on("click","#done",function() {
-		var ppp = $(this).closest("#new-day-popup");
+	$("#day-popup").on("click","#done",function() {
+		var ppp = $(this).closest("#day-popup");
 		var date = new Date(ppp.data("date"));
-		ev = cevent.create(
-				ppp.find("#ititle").val(),
-				ppp.find("#idesc").val(),
-				ppp.find("#ipeople").val()
-				);
+
+		var ititle = ppp.find("#ititle");
+		var idesc = ppp.find("#idesc");
+		var ipeople = ppp.find("#ipeople");
+
+		var ititle_mod = ititle.is(":visible");
+		var idesc_mod = idesc.is(":visible");
+		var ipeople_mod = ipeople.is(":visible");
+
+		var t = ititle_mod ?  ititle.val() : ppp.find("#title").text();
+		var d = idesc_mod ?   idesc.val()  : ppp.find("#l-desc").text();
+		var p = ipeople_mod ? ipeople.val(): ppp.find("#l-people").text();
+
+		ev = cevent.create(t,d,p);
+
 		if (valid_event(ev)){
 			cevents[date.toDateString()] = ev;
 		}else{
@@ -199,11 +233,9 @@ $(document).ready(function() {
 		ppp.find(".popup-close").trigger("click");
 		fill_calendar(date);
 	});
-	$("#new-day-popup").on("click","#remove",function() {
+	$("#day-popup").on("click","#remove",function() {
 		alert("okay remove");
 	});
 
 	fill_calendar(today);
 });
-
-
