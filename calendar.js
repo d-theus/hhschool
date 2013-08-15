@@ -40,13 +40,75 @@ function dates_eq(d1,d2){
 		d1.getDate()==d2.getDate();
 }
 
+function object_like(obj, query) {
+	var query_s = query.split(' ');
+	var regexps = [];
+	for (var i in query_s){
+		var re = new RegExp(query_s[i], "i");
+		regexps.push(re);
+	}
+	for (var prop in obj){
+		if(obj.hasOwnProperty(prop)){
+			var str = "";
+			if(prop instanceof Array){
+				str = obj[prop].join();
+			}else{
+				str = obj[prop].toString();
+				if(prop == "date"){
+					alert(str);
+				}
+			}
+			for(var i in regexps){
+				if(str.search(regexps[i]) >= 0){
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+function string_like (str, query) {
+	var query_s = query.split(' ');
+	var regexps = [];
+	for (var i in query_s){
+		var re = new RegExp(query_s[i], "i");
+		regexps.push(re);
+	}
+	for(var i in regexps){
+		if(str.search(regexps[i]) >= 0){
+			return true;
+		}
+	}
+	return false;
+}
+
 function find_events_by_date (date) {
 	return cevents[date.toDateString()];
+}
+
+function find_events_fuzzy(query){
+	var results = [];
+	for (k in cevents){
+		if(object_like(cevents[k], query) || string_like(k,query) ){
+			var res = {};
+			res.ev = cevents[k];
+			res.date = new Date(k);
+			results.push(res);
+		}
+	}
+	return results;
 }
 
 function people_helper(ppl){
 	if (ppl == null || ppl === undefined) return null;
 	return (ppl instanceof Array) ? ppl.join() : ppl;
+}
+
+function date_short_helper (date) {
+	return date.getDate().toString()+" "+
+		months_s[date.getMonth()]+" "+
+		date.getFullYear().toString();
 }
 
 function fill_calendar(d){
@@ -69,6 +131,9 @@ function fill_calendar(d){
 		if(dates_eq(today, day)){
 			td.addClass("today");
 		}
+		if(dates_eq(d, day)){
+			td.addClass("marked");
+		}
 		if(i%7 == 0 && i > 0){
 			$("#calendar").append(mktag("tr"));
 
@@ -83,6 +148,7 @@ function fill_calendar(d){
 			td.data("ev",JSON.stringify({}));
 		}
 		td.on("click", function() {
+			popupClose($("#day-popup"));
 			var td = $(this).closest(".day");
 			var ev = JSON.parse(td.data("ev")) || cevent.create();
 			var date = new Date(JSON.parse(td.data("date"))) ;
@@ -143,8 +209,6 @@ function decMonth () {
 }
 
 function popupGen(popup,par){
-	$(".popup-arrow").remove();
-	$(".popup").hide();
 	var pos = par.position();
 	popup.css({ "display":"block"});
 
@@ -163,13 +227,14 @@ function popupUnder (popup,par) {
 		"top":pos.top+par.height()*1.3,
 		"left":pos.left+par.width()*0.5});
 
-	popup.parent().append('<div class="popup-arrow popup-arrow-up"></div>');
+	popup.append('<div class="popup-arrow popup-arrow-up"></div>');
 
 	$(".popup-arrow").css({
-		"top":popup.position().top - 4,
-		"left":popup.position().left + 2,
+		"top":-4,
+		"left":popup.width()/2-5,
 		"display":"block"});
 }
+
 function popupRight (popup,par) {
 	popupGen(popup,par);
 	var pos = par.position();
@@ -177,16 +242,42 @@ function popupRight (popup,par) {
 		"top":pos.top+par.height()/2 - popup.height()/2,
 		"left":pos.left+par.width()*1.2});
 
-	popup.parent().append('<div class="popup-arrow popup-arrow-left"></div>');
+	popup.append('<div class="popup-arrow popup-arrow-left"></div>');
 
 	$(".popup-arrow").css({
-		"top":popup.position().top + popup.height()/2,
-		"left": popup.position().left - 4, 
-		"display":"block"});
+		"top": popup.height()/2,
+		"left": -4,
+		"display": "block"
+	});
+}
+
+function popupClose (popup) {
+	popup.find(".popup-arrow").remove();
+	popup.hide();
 }
 
 function valid_event(ev) {
 	return ev.title != null && ev.title.length > 0;
+}
+
+function search_result_item (result) {
+	var itm = mktag("li");
+	var div = itm.append(mktag("div")).find("div");
+	div.append(mktag("p"))
+		.find("p:last")
+		.append(mktagcontent("strong",result.ev.title));
+	div.append(mktag("p"))
+		.find("p:last")
+		.append(mktagcontent("small",date_short_helper(result.date)));
+	div.addClass("highlightable");
+	div.data("date", result.date.toDateString());
+	div.on("click",function() {
+		popupClose($(this).closest(".popup"));
+		fill_calendar(new Date($(this).data("date")));
+		$(".marked").trigger("click");
+		$(".marked").removeClass("marked");
+	});
+	return itm;
 }
 
 $(document).ready(function() {
@@ -204,29 +295,7 @@ $(document).ready(function() {
 	$("#day-popup").on("click","#done",function() {
 		var ppp = $(this).closest("#day-popup");
 		var date = new Date(ppp.data("date"));
-
-		//var ititle = ppp.find("#ititle");
-		//var idesc = ppp.find("#idesc");
-		//var ipeople = ppp.find("#ipeople");
-
-		//var ititle_mod = ititle.is(":visible");
-		//var idesc_mod = idesc.is(":visible");
-		//var ipeople_mod = ipeople.is(":visible");
-
-		//var t = ititle_mod ?  ititle.val() : ppp.find("#title").text();
-		//var d = idesc_mod ?   idesc.val()  : ppp.find("#l-desc").text();
-		//var p = ipeople_mod ? ipeople.val(): ppp.find("#l-people").text();
-
-		//ev = cevent.create(t,d,p);
-
-		//if (valid_event(ev)){
-			//cevents[date.toDateString()] = ev;
-		//}//else{
-			//alert("Некоторые важные поля не заполнены");
-			//return false;
-		//}
-		////localStorage.setItem("cevents",JSON.stringify(cevents));
-		ppp.find(".popup-close").trigger("click");
+		popupClose(ppp);
 		fill_calendar(date);
 	});
 	$("#day-popup").on("click","#remove",function() {
@@ -264,6 +333,7 @@ $(document).ready(function() {
 			localStorage.setItem("cevents", JSON.stringify(cevents));
 		}
 	});
+
 	$("#day-popup .toggle").on("click",function(e) {
 		e.preventDefault();
 		var target = $(this).data("target");
@@ -272,5 +342,27 @@ $(document).ready(function() {
 		ppp.find("#"+target).hide();
 	});
 
+	$("#search-input").on("keyup",function() {
+		var sr = $("#search-results-popup");
+		popupClose(sr);
+		sr.find("li").remove();
+		var query = $(this).val();
+		if(query.length > 0){
+			var results = find_events_fuzzy(query);
+			if(results.length > 0){
+				for(var i in results){
+					sr.find("ul").append(search_result_item(results[i]));
+					popupUnder(sr,$("#search-input"));
+				}
+			}
+		}
+	});
+	$("#search-results-popup").on("mouseenter",".highlightable",function() {
+		$(this).toggleClass("highlighted");
+	});
+	$("#search-results-popup").on("mouseleave",".highlightable",function() {
+		$(this).toggleClass("highlighted");
+	});
+
 	fill_calendar(today);
-});
+	});

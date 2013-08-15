@@ -88,3 +88,20 @@ fieldset{
 #day-popup-desc{
 	margin: 0px 10px;
 }
+
+#search-results-popup{
+	width: 150px;
+	display: block;
+}
+#search-results-popup > ul{
+	list-style: none;
+	margin-left: 5px;
+	padding-left: 0px;
+}
+#search-results-popup > ul > div{
+	margin: auto;
+}
+.highlighted{
+	color: white;
+	background-color: #0066ff;
+}
