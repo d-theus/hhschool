@@ -138,7 +138,7 @@ function fill_calendar(d){
 			$("#calendar").append(mktag("tr"));
 
 		}
-		td.data("date",JSON.stringify(day.toString()));
+		td.data("date",JSON.stringify(day.toDateString()));
 		var ev = find_events_by_date(day);
 		if (ev !== undefined){
 			td.data("ev",JSON.stringify(ev));
@@ -148,7 +148,6 @@ function fill_calendar(d){
 			td.data("ev",JSON.stringify({}));
 		}
 		td.on("click", function() {
-			popupClose($("#day-popup"));
 			var td = $(this).closest(".day");
 			var ev = JSON.parse(td.data("ev")) || cevent.create();
 			var date = new Date(JSON.parse(td.data("date"))) ;
@@ -179,9 +178,11 @@ function fill_calendar(d){
 				dpp.find("#idesc").hide();
 			}
 			dpp.find("#date").text(date.getDate().toString() + " " + months_s[date.getMonth()]);
+			alert("assigning date to popup. date:\n"+ td.data("date") +
+					"\nevent:\n"+JSON.stringify(ev));
+			popupRight(dpp,$(this));
 			dpp.data("date",td.data("date"));
-			dpp.data("event",ev);
-			popupRight($("#day-popup"),$(this));
+			dpp.data("ev",ev);
 		});
 		$("#calendar tr:last").append(td);
 		i++;
@@ -216,8 +217,7 @@ function popupGen(popup,par){
 	popup.find(".popup-close").on("click",function(e) {
 		e.preventDefault();
 		e.stopPropagation();
-		$(this).closest(".popup").css({"display":"none"});
-		$(".popup-arrow").remove();
+		popupClose($(this).closest(".popup"));
 	});
 }
 
@@ -254,6 +254,9 @@ function popupRight (popup,par) {
 
 function popupClose (popup) {
 	popup.find(".popup-arrow").remove();
+	popup.find(".row fieldset input, textarea").val("");
+	popup.removeData("date");
+	popup.removeData("ev");
 	popup.hide();
 }
 
@@ -305,16 +308,19 @@ $(document).ready(function() {
 	$("#day-popup").on("click","#done",function() {
 		var ppp = $(this).closest("#day-popup");
 		var date = new Date(ppp.data("date"));
-		popupClose(ppp);
 		fill_calendar(date);
+		popupClose(ppp);
+		//alert("checking popup values:\n"+
+			//"date:\n"+ ppp.data("date") +
+			//"\nevent:\n"+JSON.stringify(ppp.data("ev")));
 	});
 	$("#day-popup").on("click","#remove",function() {
 		alert("okay remove");
 	});
-	$("#day-popup input,textarea").change(function() {
+	$("#day-popup input,textarea").blur(function() {
 		var ppp = $(this).closest("#day-popup");
 		var date = new Date(ppp.data("date"));
-		var ev = ppp.data("ev") || cevent.create();
+		var ev = ppp.data("ev");
 		switch($(this).attr("id")) {
 			case 'ititle':
 				ev.title = $(this).val();
@@ -331,13 +337,14 @@ $(document).ready(function() {
 				ppp.find("#idesc").hide();
 				break;
 			case 'ipeople':
-				ev.people = $(this).val();
+				ev.people = ($(this).val().split(","));
 				ppp.find("#l-people").text(people_helper(ev.people));
 				ppp.find("#people").show();
 				ppp.find("#ipeople").hide();
 				break;
 		}
 		ppp.data("ev",ev);
+		alert("current data in popup:\nevent:\n"+JSON.stringify(ev)+"date:\n"+date.toString());
 		if(valid_event(ev)){
 			cevents[date.toDateString()] = ev;
 			localStorage.setItem("cevents", JSON.stringify(cevents));
@@ -348,8 +355,12 @@ $(document).ready(function() {
 		e.preventDefault();
 		var target = $(this).data("target");
 		var ppp = $(this).closest(".popup");
-		ppp.find("#i"+target).show();
-		ppp.find("#"+target).hide();
+		var lbl = ppp.find("#l-"+target);
+		var inp = ppp.find("#i"+target);
+		var cont = ppp.find("#"+target);
+		inp.val(lbl.text().trim());
+		inp.show();
+		cont.hide();
 	});
 
 	$("#search-input").on("keyup",function() {
@@ -376,7 +387,6 @@ $(document).ready(function() {
 
 	$("#fast-create-popup #fast-create-text").on("keyup",function(){
 		var ppp = $(this).closest(".popup");
-		//parse input
 		var val = $(this).val();
 		if(val.length == 0) {
 			disable_submit_and_clr(ppp);
@@ -384,7 +394,6 @@ $(document).ready(function() {
 		}
 
 		var strings = val.split(',');
-		//validate input
 		if (strings.length > 1)
 			var date = new Date(strings[0]);
 		else{
