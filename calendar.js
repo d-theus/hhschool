@@ -19,12 +19,7 @@ cevent = {
 
 };
 
-test_events = new Object();
-test_events[(new Date(2013,8,8)).toDateString()] =  cevent.create("oneone", "", ["me", "also me"]);
-test_events[(new Date(2013,8,14)).toDateString()] = cevent.create("twowo", "", ["not me", "ehh"]);
-
-localStorage.setItem("cevents", JSON.stringify(test_events));
-cevents = JSON.parse(localStorage["cevents"]);
+cevents = JSON.parse(localStorage["cevents"] || "{}");
 
 
 function clone(obj) {
@@ -92,7 +87,7 @@ function fill_calendar(d){
 			var ev = JSON.parse(td.data("ev")) || cevent.create();
 			var date = new Date(JSON.parse(td.data("date"))) ;
 			var dpp = $("#day-popup");
-			if ( ev.title == null){
+			if ( ev.title == null || ev.title.length == 0){
 				dpp.find("#title").hide();
 				dpp.find("#ititle").show();
 			}else{
@@ -119,6 +114,7 @@ function fill_calendar(d){
 			}
 			dpp.find("#date").text(date.getDate().toString() + " " + months_s[date.getMonth()]);
 			dpp.data("date",td.data("date"));
+			dpp.data("event",ev);
 			popupRight($("#day-popup"),$(this));
 		});
 		$("#calendar tr:last").append(td);
@@ -190,7 +186,7 @@ function popupRight (popup,par) {
 }
 
 function valid_event(ev) {
-return ev.title != null && ev.title.length > 0;
+	return ev.title != null && ev.title.length > 0;
 }
 
 $(document).ready(function() {
@@ -209,32 +205,71 @@ $(document).ready(function() {
 		var ppp = $(this).closest("#day-popup");
 		var date = new Date(ppp.data("date"));
 
-		var ititle = ppp.find("#ititle");
-		var idesc = ppp.find("#idesc");
-		var ipeople = ppp.find("#ipeople");
+		//var ititle = ppp.find("#ititle");
+		//var idesc = ppp.find("#idesc");
+		//var ipeople = ppp.find("#ipeople");
 
-		var ititle_mod = ititle.is(":visible");
-		var idesc_mod = idesc.is(":visible");
-		var ipeople_mod = ipeople.is(":visible");
+		//var ititle_mod = ititle.is(":visible");
+		//var idesc_mod = idesc.is(":visible");
+		//var ipeople_mod = ipeople.is(":visible");
 
-		var t = ititle_mod ?  ititle.val() : ppp.find("#title").text();
-		var d = idesc_mod ?   idesc.val()  : ppp.find("#l-desc").text();
-		var p = ipeople_mod ? ipeople.val(): ppp.find("#l-people").text();
+		//var t = ititle_mod ?  ititle.val() : ppp.find("#title").text();
+		//var d = idesc_mod ?   idesc.val()  : ppp.find("#l-desc").text();
+		//var p = ipeople_mod ? ipeople.val(): ppp.find("#l-people").text();
 
-		ev = cevent.create(t,d,p);
+		//ev = cevent.create(t,d,p);
 
-		if (valid_event(ev)){
-			cevents[date.toDateString()] = ev;
-		}else{
-			alert("Некоторые важные поля не заполнены");
-			return false;
-		}
-		localStorage.setItem("cevents",JSON.stringify(cevents));
+		//if (valid_event(ev)){
+			//cevents[date.toDateString()] = ev;
+		//}//else{
+			//alert("Некоторые важные поля не заполнены");
+			//return false;
+		//}
+		////localStorage.setItem("cevents",JSON.stringify(cevents));
 		ppp.find(".popup-close").trigger("click");
 		fill_calendar(date);
 	});
 	$("#day-popup").on("click","#remove",function() {
 		alert("okay remove");
+	});
+	$("#day-popup input,textarea").change(function() {
+		var ppp = $(this).closest("#day-popup");
+		var date = new Date(ppp.data("date"));
+		var ev = ppp.data("ev") || cevent.create();
+		switch($(this).attr("id")) {
+			case 'ititle':
+				ev.title = $(this).val();
+				if ( ev.title.length > 0){
+					ppp.find("#title").text(ev.title);
+					ppp.find("#title").show();
+					ppp.find("#ititle").hide();
+				}
+				break;
+			case 'idesc':
+				ev.desc = $(this).val();
+				ppp.find("#desc").show();
+				ppp.find("#l-desc").text(ev.desc);
+				ppp.find("#idesc").hide();
+				break;
+			case 'ipeople':
+				ev.people = $(this).val();
+				ppp.find("#l-people").text(people_helper(ev.people));
+				ppp.find("#people").show();
+				ppp.find("#ipeople").hide();
+				break;
+		}
+		ppp.data("ev",ev);
+		if(valid_event(ev)){
+			cevents[date.toDateString()] = ev;
+			localStorage.setItem("cevents", JSON.stringify(cevents));
+		}
+	});
+	$("#day-popup .toggle").on("click",function(e) {
+		e.preventDefault();
+		var target = $(this).data("target");
+		var ppp = $(this).closest(".popup");
+		ppp.find("#i"+target).show();
+		ppp.find("#"+target).hide();
 	});
 
 	fill_calendar(today);
