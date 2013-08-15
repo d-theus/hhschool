@@ -280,6 +280,12 @@ function search_result_item (result) {
 	return itm;
 }
 
+function disable_submit_and_clr (ppp) {
+	ppp.data("ev",null);
+	ppp.data("date",null);
+	ppp.find("#fast-create-submit").attr("disabled","true");
+}
+
 $(document).ready(function() {
 
 	$("#next-month").on("click",function() {
@@ -288,6 +294,9 @@ $(document).ready(function() {
 	$("#prev-month").on("click",function() {
 		decMonth();
 	});
+	$("#fast-create").on("click",function() {
+		popupUnder($("#fast-create-popup"), $(this));
+	})
 	$("#today-button").on("click",function() {
 		fill_calendar(today);
 		$(".today").trigger("click");
@@ -362,6 +371,49 @@ $(document).ready(function() {
 	});
 	$("#search-results-popup").on("mouseleave",".highlightable",function() {
 		$(this).toggleClass("highlighted");
+	});
+
+	$("#fast-create-popup #fast-create-text").on("keyup",function(){
+		var ppp = $(this).closest(".popup");
+		//parse input
+		var val = $(this).val();
+		if(val.length == 0) {
+			disable_submit_and_clr(ppp);
+			return;
+		}
+
+		var strings = val.split(',');
+		//validate input
+		if (strings.length > 1)
+			var date = new Date(strings[0]);
+		else{
+			disable_submit_and_clr(ppp);
+			return;
+		}
+		if(date == "Invalid Date") {
+			alert("Непонятно, что за дата. Формат гггг-мм-дд.");
+			disable_submit_and_clr(ppp);
+			return;
+		}
+		
+		var event_title = strings[1] || "";
+		if(event_title != null && event_title.length > 0){
+			ppp.find("#fast-create-submit").removeAttr("disabled");
+			ppp.data("ev",JSON.stringify(cevent.create(event_title)) );
+			ppp.data("date",date.toDateString());
+		}
+		else{
+			disable_submit_and_clr(ppp);
+		}
+	});
+	$("#fast-create-submit").on("click",function() {
+		var ppp = $(this).closest(".popup");
+		var date = ppp.data("date");
+		var ev = JSON.parse(ppp.data("ev"));
+		cevents[date] = ev;
+		localStorage.setItem("cevents", JSON.stringify(cevents));
+		popupClose($("#fast-create-popup"));
+		fill_calendar(new Date(date));
 	});
 
 	fill_calendar(today);

@@ -11,8 +11,8 @@
 	<h1 id="heading">Calendar by Andrew D</h1>
 	<div class="row">
 		<div class="button-group">
-			<input type="button" name="some_name" value="Добавить">
-			<input type="button" name="some_name" value="Обновить">
+			<input id="fast-create" type="button" name="some_name" value="Добавить">
+			<input id="edit" type="button" name="some_name" value="Обновить">
 		</div>
 		<div class="search-form">
 			<input id="search-input" type="text" name="some_name" placeholder="События, дата или участники" size="30">
@@ -68,6 +68,12 @@
 <div id="search-results-popup" class="popup popup-down">
 	<ul id="results" class="list">
 	</ul>
+</div>
+
+<div id="fast-create-popup" class="popup popup-down">
+	<h3> Добавить событие </h3>
+	<input id="fast-create-text" type="text" name="some_name" value="" placeholder="Дата, название...">
+	<input id="fast-create-submit"type="button" name="submit" value="Создать" disabled="true">
 </div>
 
 
