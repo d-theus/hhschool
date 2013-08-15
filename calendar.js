@@ -209,6 +209,7 @@ function decMonth () {
 }
 
 function popupGen(popup,par){
+	popupClose($(".popup"));
 	var pos = par.position();
 	popup.css({ "display":"block"});
 
