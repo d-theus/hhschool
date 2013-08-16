@@ -54,9 +54,6 @@ function object_like(obj, query) {
 				str = obj[prop].join();
 			}else{
 				str = obj[prop].toString();
-				if(prop == "date"){
-					alert(str);
-				}
 			}
 			for(var i in regexps){
 				if(str.search(regexps[i]) >= 0){
@@ -149,10 +146,11 @@ function fill_calendar(d){
 		}
 		td.on("click", function() {
 			var td = $(this).closest(".day");
-			var ev = JSON.parse(td.data("ev")) || cevent.create();
+			var ev = JSON.parse(td.data("ev"));
+			var stored = ev.title === undefined ? false : true;
 			var date = new Date(JSON.parse(td.data("date"))) ;
 			var dpp = $("#day-popup");
-			if ( ev.title == null || ev.title.length == 0){
+			if ( ev.title === undefined || ev.title.length == 0){
 				dpp.find("#title").hide();
 				dpp.find("#ititle").show();
 			}else{
@@ -178,11 +176,10 @@ function fill_calendar(d){
 				dpp.find("#idesc").hide();
 			}
 			dpp.find("#date").text(date.getDate().toString() + " " + months_s[date.getMonth()]);
-			alert("assigning date to popup. date:\n"+ td.data("date") +
-					"\nevent:\n"+JSON.stringify(ev));
 			popupRight(dpp,$(this));
 			dpp.data("date",td.data("date"));
 			dpp.data("ev",ev);
+			stored ? dpp.find("#remove").removeAttr("disabled") : dpp.find("#remove").attr("disabled","true"); 
 		});
 		$("#calendar tr:last").append(td);
 		i++;
@@ -255,8 +252,9 @@ function popupRight (popup,par) {
 function popupClose (popup) {
 	popup.find(".popup-arrow").remove();
 	popup.find(".row fieldset input, textarea").val("");
-	popup.removeData("date");
-	popup.removeData("ev");
+	//popup.removeData("date");
+	//popup.removeData("ev");
+	popup.removeData();
 	popup.hide();
 }
 
@@ -315,7 +313,16 @@ $(document).ready(function() {
 			//"\nevent:\n"+JSON.stringify(ppp.data("ev")));
 	});
 	$("#day-popup").on("click","#remove",function() {
-		alert("okay remove");
+		var ppp = $(this).closest("#day-popup");
+		if(confirm("Уверены?")){
+			var date = ppp.data("date");
+			delete cevents[JSON.parse(date)];
+			localStorage.setItem("cevents",JSON.stringify(cevents));
+			popupClose(ppp);
+			fill_calendar(new Date(date));
+		}else{
+			return false;
+		}
 	});
 	$("#day-popup input,textarea").blur(function() {
 		var ppp = $(this).closest("#day-popup");
@@ -344,10 +351,10 @@ $(document).ready(function() {
 				break;
 		}
 		ppp.data("ev",ev);
-		alert("current data in popup:\nevent:\n"+JSON.stringify(ev)+"date:\n"+date.toString());
 		if(valid_event(ev)){
 			cevents[date.toDateString()] = ev;
 			localStorage.setItem("cevents", JSON.stringify(cevents));
+			ppp.find("#remove").removeAttr("disabled");
 		}
 	});
 
