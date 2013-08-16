@@ -33,8 +33,10 @@
 <div id="day-popup" class="popup popup-right">
 
 	<div class="row">
-		<a class="undecor toggle" href="#" data-target="title"> <h3 id="title" class="left"> </h3> </a>
 		<a href="#" class="popup-close right">&times;</a>
+		<div id="title" class="toggle" data-target="title">
+			<h3 id="l-title" class="left"> </h3>
+		</div>
 	</div>
 	
 	<div class="row">
@@ -42,19 +44,20 @@
 		<fieldset class="col">
 			<input id="ititle" type="text" name="event" value="" placeholder="Событие">
 			<input id="ipeople" type="text" name="people" value="" placeholder="Участники">
-			<div id="people" class="col">
-				<a class="undecor toggle" href="#" data-target="people"> Участники: </a>
-				<p id="l-people"></p>
-			</div>
 		</fieldset>
+		<div id="people" class="col toggle" data-target="people">
+			<h3 class="secondary"> Участники: </h3>
+			<p id="l-people"></p>
+		</div>
 	</div>
 
 	<br>
 
 	<div class="row">
 		<textarea id="idesc" placeholder="Описание" rows=10 cols=50></textarea>
-		<div id="desc" class="col">
-			<a class="undecor toggle" href="#" data-target="desc"> Описание: </a>
+		<div id="desc" class="col toggle" data-target="desc">
+			<!--<a class="undecor" href="#" data-target="desc">  </a>-->
+			<h3 class="secondary"> Описание: </h3>
 			<p id="l-desc"></p>
 		</div>
 	</div>
@@ -66,8 +69,8 @@
 </div>
 
 <div id="search-results-popup" class="popup popup-down">
-	<ul id="results" class="list">
-	</ul>
+	<ul id="results" class="list"> </ul>
+	<div id="fading"> </div>
 </div>
 
 <div id="fast-create-popup" class="popup popup-down">

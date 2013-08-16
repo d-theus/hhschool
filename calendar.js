@@ -124,7 +124,8 @@ function fill_calendar(d){
 	$("#calendar tbody").append(mktag("tr"));
 	while(i < dayCount){
 		var dow = i < 7 ? dows[i]+", " : "";
-		var td = mktag("td").append(dow+day.getDate()).addClass("day");
+		var td = mktag("td").append(mktag("div")).find("div");
+		td.append(dow+day.getDate()).addClass("day");
 		if(dates_eq(today, day)){
 			td.addClass("today");
 		}
@@ -141,6 +142,7 @@ function fill_calendar(d){
 			td.data("ev",JSON.stringify(ev));
 			var ppl = people_helper(ev.people);
 			td.append(mktagcontent( "p", ev.title+"</br>"+ ppl));
+			td.addClass("has-event");
 		} else{
 			td.data("ev",JSON.stringify({}));
 		}
@@ -154,7 +156,7 @@ function fill_calendar(d){
 				dpp.find("#title").hide();
 				dpp.find("#ititle").show();
 			}else{
-				dpp.find("#title").text(ev.title);
+				dpp.find("#l-title").text(ev.title);
 				dpp.find("#title").show();
 				dpp.find("#ititle").hide();
 			}
@@ -181,7 +183,7 @@ function fill_calendar(d){
 			dpp.data("ev",ev);
 			stored ? dpp.find("#remove").removeAttr("disabled") : dpp.find("#remove").attr("disabled","true"); 
 		});
-		$("#calendar tr:last").append(td);
+		$("#calendar tr:last").append(td.parent());
 		i++;
 		day.setDate(day.getDate() +1);
 	}
@@ -252,8 +254,6 @@ function popupRight (popup,par) {
 function popupClose (popup) {
 	popup.find(".popup-arrow").remove();
 	popup.find(".row fieldset input, textarea").val("");
-	//popup.removeData("date");
-	//popup.removeData("ev");
 	popup.removeData();
 	popup.hide();
 }
@@ -308,9 +308,6 @@ $(document).ready(function() {
 		var date = new Date(ppp.data("date"));
 		fill_calendar(date);
 		popupClose(ppp);
-		//alert("checking popup values:\n"+
-			//"date:\n"+ ppp.data("date") +
-			//"\nevent:\n"+JSON.stringify(ppp.data("ev")));
 	});
 	$("#day-popup").on("click","#remove",function() {
 		var ppp = $(this).closest("#day-popup");
@@ -332,7 +329,7 @@ $(document).ready(function() {
 			case 'ititle':
 				ev.title = $(this).val();
 				if ( ev.title.length > 0){
-					ppp.find("#title").text(ev.title);
+					ppp.find("#l-title").text(ev.title);
 					ppp.find("#title").show();
 					ppp.find("#ititle").hide();
 				}
