@@ -212,6 +212,7 @@ function popupGen(popup,par){
 	popupClose($(".popup"));
 	var pos = par.position();
 	popup.css({ "display":"block"});
+	//popup.slideToggle();
 
 	popup.find(".popup-close").on("click",function(e) {
 		e.preventDefault();
@@ -225,7 +226,9 @@ function popupUnder (popup,par) {
 	var pos = par.position();
 	popup.css({
 		"top":pos.top+par.height()*1.3,
-		"left":pos.left+par.width()*0.5});
+		"left":pos.left+par.width()*0.5,
+		"display":"none"});
+	popup.slideDown();
 
 	popup.append('<div class="popup-arrow popup-arrow-up"></div>');
 
@@ -238,9 +241,10 @@ function popupUnder (popup,par) {
 function popupRight (popup,par) {
 	popupGen(popup,par);
 	var pos = par.position();
+	var table = par.closest("table");
 	popup.css({
-		"top":pos.top+par.height()/2 - popup.height()/2,
-		"left":pos.left+par.width()*1.2});
+		"top":table.position().top + pos.top+par.height()/2 - popup.height()/2,
+		"left":table.position().left + pos.left+par.width()});
 
 	popup.append('<div class="popup-arrow popup-arrow-left"></div>');
 
@@ -289,12 +293,31 @@ function disable_submit_and_clr (ppp) {
 }
 
 $(document).ready(function() {
-
 	$("#next-month").on("click",function() {
+		$("#calendar").animate({
+			"left": "-=2500px"
+		}, function(){
+			$("#calendar").css({
+				"left": 2500
+			});
 		incMonth();
+		});
+		$("#calendar").animate({
+			left: "-=2500px"
+		});
 	});
 	$("#prev-month").on("click",function() {
+		$("#calendar").animate({
+			"left": "+=2500px"
+		}, function(){
+			$("#calendar").css({
+				"left": -2500
+			});
 		decMonth();
+		});
+		$("#calendar").animate({
+			left: "+=2500px"
+		});
 	});
 	$("#fast-create").on("click",function() {
 		popupUnder($("#fast-create-popup"), $(this));
@@ -377,8 +400,8 @@ $(document).ready(function() {
 			if(results.length > 0){
 				for(var i in results){
 					sr.find("ul").append(search_result_item(results[i]));
-					popupUnder(sr,$("#search-input"));
 				}
+				popupUnder(sr,$("#search-input"));
 			}
 		}
 	});
