@@ -223,7 +223,7 @@ function popupGen(popup,par){
 
 function popupUnder (popup,par) {
 	popupGen(popup,par);
-	var pos = par.position();
+	var pos = par.offset();
 	popup.css({
 		"top":pos.top+par.height()*1.3,
 		"left":pos.left+par.width()*0.5,
@@ -244,7 +244,7 @@ function popupRight (popup,par) {
 	var table = par.closest("table");
 	popup.css({
 		"top":table.position().top + pos.top+par.height()/2 - popup.height()/2,
-		"left":table.position().left + pos.left+par.width()});
+		"left":par.offset().left + table.width()/4 });
 
 	popup.append('<div class="popup-arrow popup-arrow-left"></div>');
 
@@ -295,28 +295,24 @@ function disable_submit_and_clr (ppp) {
 $(document).ready(function() {
 	$("#next-month").on("click",function() {
 		$("#calendar").animate({
-			"left": "-=2500px"
+			"left": "-=100%"
 		}, function(){
-			$("#calendar").css({
-				"left": 2500
-			});
+			$("#calendar").css( "left", "102%");
 		incMonth();
 		});
 		$("#calendar").animate({
-			left: "-=2500px"
+			left: "-=52%"
 		});
 	});
 	$("#prev-month").on("click",function() {
 		$("#calendar").animate({
-			"left": "+=2500px"
+			"left": "+=100%"
 		}, function(){
-			$("#calendar").css({
-				"left": -2500
-			});
+			$("#calendar").css("left","-2%");
 		decMonth();
 		});
 		$("#calendar").animate({
-			left: "+=2500px"
+			left: "+=52%"
 		});
 	});
 	$("#fast-create").on("click",function() {
