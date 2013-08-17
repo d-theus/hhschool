@@ -6,13 +6,13 @@
 	height: 100px;
 }
 .body{
-	margin-left: auto;
-	margin-right: auto;
-	overflow: show;
-}
+	overflow: auto;
+	clear: both; }
 #calendar{
-	margin: 10px;
 	position: absolute;
+	left: 50%;
+	/*margin: 0 auto;*/
+	margin-left: -490px;//140*7/2 - 6
 	border-collapse: collapse;
 }
 #calendar > tbody > tr > td{
@@ -22,10 +22,10 @@
 }
 .day{
 	text-align: left;
-	overflow: hidden;
-	padding: 4px;
 	width: 140px;
 	height: 140px;
+	overflow: hidden;
+	padding: 4px;
 	vertical-align: top;
 	padding: 3px;
 	margin: 0px;
@@ -42,6 +42,13 @@
 .search-form{
 	float: right;
 	margin-right: 20px;
+}
+.search-form input[type="text"]{
+	border-radius: 5px;
+	box-shadow: none;
+	border: solid gray 1px;
+	padding-left: 10px;
+	padding-top:3px;
 }
 
 .popup{
@@ -160,6 +167,7 @@ fieldset{
 #day-popup{
 	max-width: 300px;
 	overflow: visible;
+	margin-left: -200px;
 	word-wrap: break-word;
 }
 
@@ -188,6 +196,10 @@ fieldset{
 
 #day-popup .row{
 	margin: -10px 0px;
+}
+
+#fast-create-popup .popup-arrow{
+	margin-left: -110px;
 }
 
 .secondary{
