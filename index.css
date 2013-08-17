@@ -118,8 +118,21 @@ fieldset{
 	margin-left: 5px;
 	padding-left: 0px;
 	max-height: 500px;
-	overflow: auto;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
+#search-results-popup > ul > li > div{
+	border-bottom: 1px solid lightgray;
+	margin: auto;
+	margin-right: 10px;
+}
+#search-results-popup > ul > li > div > p {
+	margin: 0px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 
 #fading{
 	position: absolute;
