@@ -2,8 +2,8 @@ dows=["Понедельник","Вторник","Среда","Четверг","�
 months = ["Январь", "Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь" ];
 months_s = ["января", "февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря" ];
 today = new Date();
-month = today.getMonth();
-year = today.getFullYear();
+$month = today.getMonth();
+$year = today.getFullYear();
 
 cevent = {
 	title: "",
@@ -109,6 +109,9 @@ function date_short_helper (date) {
 }
 
 function fill_calendar(d){
+	$year = d.getFullYear();
+	$month = d.getMonth();
+
 	var fdm = new Date(d.getFullYear(), d.getMonth(), 1);
 	var ldm = new Date(d.getFullYear(), d.getMonth()+1, 0);
 
@@ -136,7 +139,7 @@ function fill_calendar(d){
 			$("#calendar").append(mktag("tr"));
 
 		}
-		td.data("date",JSON.stringify(day.toDateString()));
+		td.data("date",day.toDateString());
 		var ev = find_events_by_date(day);
 		if (ev !== undefined){
 			td.data("ev",JSON.stringify(ev));
@@ -150,7 +153,7 @@ function fill_calendar(d){
 			var td = $(this).closest(".day");
 			var ev = JSON.parse(td.data("ev"));
 			var stored = ev.title === undefined ? false : true;
-			var date = new Date(JSON.parse(td.data("date"))) ;
+			var date = new Date(td.data("date")) ;
 			var dpp = $("#day-popup");
 			if ( ev.title === undefined || ev.title.length == 0){
 				dpp.find("#title").hide();
@@ -191,20 +194,20 @@ function fill_calendar(d){
 }
 
 function incMonth () {
-	if (month == 11) {
-		year++;
-		month = 0;
-	}else month++;
-	var nd = new Date(year, month, 1);
+	if ($month == 11) {
+		$year++;
+		$month = 0;
+	}else $month++;
+	var nd = new Date($year, $month, 1);
 	fill_calendar(dates_eq(today,nd) ? today : nd);
 }
 
 function decMonth () {
-	if (month == 0) {
-		year--;
-		month = 11;
-	}else month--;
-	var nd = new Date(year, month, 1);
+	if ($month == 0) {
+		$year--;
+		$month = 11;
+	}else $month--;
+	var nd = new Date($year, $month, 1);
 	fill_calendar(dates_eq(today,nd) ? today : nd);
 }
 
@@ -263,7 +266,7 @@ function popupClose (popup) {
 }
 
 function valid_event(ev) {
-	return ev.title != null && ev.title.length > 0;
+	return ev !== undefined && ev.title != null && ev.title.length > 0;
 }
 
 function search_result_item (result) {
@@ -293,6 +296,7 @@ function disable_submit_and_clr (ppp) {
 }
 
 $(document).ready(function() {
+
 	$("#next-month").on("click",function() {
 		$("#calendar").animate({
 			"left": "-=100%"
@@ -316,23 +320,27 @@ $(document).ready(function() {
 		});
 	});
 	$("#fast-create").on("click",function() {
-		popupUnder($("#fast-create-popup"), $(this));
-	})
+		var fcp = $("#fast-create-popup");
+		popupUnder(fcp, $(this));
+		fcp.find("input[type='text']").val("");
+	});
 	$("#today-button").on("click",function() {
 		fill_calendar(today);
 		$(".today").trigger("click");
 	});
+
 	$("#day-popup").on("click","#done",function() {
-		var ppp = $(this).closest("#day-popup");
+		var ppp = $(this).closest(".popup");
 		var date = new Date(ppp.data("date"));
 		fill_calendar(date);
 		popupClose(ppp);
 	});
+
 	$("#day-popup").on("click","#remove",function() {
 		var ppp = $(this).closest("#day-popup");
 		if(confirm("Уверены?")){
-			var date = ppp.data("date");
-			delete cevents[JSON.parse(date)];
+			var date = new Date(ppp.data("date"));
+			delete cevents[date.toDateString()];
 			localStorage.setItem("cevents",JSON.stringify(cevents));
 			popupClose(ppp);
 			fill_calendar(new Date(date));
@@ -430,7 +438,7 @@ $(document).ready(function() {
 		}
 		
 		var event_title = strings[1] || "";
-		if(event_title != null && event_title.length > 0){
+		if(event_title != null && event_title.length > 0 && date != null){
 			ppp.find("#fast-create-submit").removeAttr("disabled");
 			ppp.data("ev",JSON.stringify(cevent.create(event_title)) );
 			ppp.data("date",date.toDateString());
@@ -439,11 +447,12 @@ $(document).ready(function() {
 			disable_submit_and_clr(ppp);
 		}
 	});
+
 	$("#fast-create-submit").on("click",function() {
 		var ppp = $(this).closest(".popup");
-		var date = ppp.data("date");
+		var date = new Date(ppp.data("date"));
 		var ev = JSON.parse(ppp.data("ev"));
-		cevents[date] = ev;
+		cevents[date.toDateString()] = ev;
 		localStorage.setItem("cevents", JSON.stringify(cevents));
 		popupClose($("#fast-create-popup"));
 		fill_calendar(new Date(date));
