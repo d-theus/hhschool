@@ -151,6 +151,10 @@ function fill_calendar(d){
 		}
 		td.on("click", function() {
 			var td = $(this).closest(".day");
+
+			$(".chosen").removeClass("chosen");
+			td.addClass("chosen");
+
 			var ev = JSON.parse(td.data("ev"));
 			var stored = ev.title === undefined ? false : true;
 			var date = new Date(td.data("date")) ;

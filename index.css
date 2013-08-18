@@ -143,8 +143,9 @@ fieldset{
 }
 
 .chosen{
-	border-color: #0066ff;
-	background-color: #2288ff;
+	margin: -2px;
+	border: solid 2px #0066ff !important;
+	background-color: #3388ff !important;
 }
 
 .undecor {
