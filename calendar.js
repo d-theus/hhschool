@@ -144,7 +144,10 @@ function fill_calendar(d){
 		if (ev !== undefined){
 			td.data("ev",JSON.stringify(ev));
 			var ppl = people_helper(ev.people);
-			td.append(mktagcontent( "p", ev.title+"</br>"+ ppl));
+			td.append(mktag("p"));
+			td.find("p").append(mktagcontent("strong", ev.title));
+			td.find("p").append("</br>");
+			td.find("p").append(ppl);
 			td.addClass("has-event");
 		} else{
 			td.data("ev",JSON.stringify({}));
@@ -221,12 +224,12 @@ function popupGen(popup,par){
 	popupClose($(".popup"));
 	var pos = par.position();
 	popup.css({ "display":"block"});
-	//popup.slideToggle();
 
 	popup.find(".popup-close").on("click",function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		popupClose($(this).closest(".popup"));
+		$(".chosen").removeClass("chosen");
 	});
 }
 

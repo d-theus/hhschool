@@ -10,8 +10,7 @@
 </head>
 <body>
 <div class="heading">
-	<h1 id="heading">Calendar by Andrew D</h1>
-	<div class="row">
+	<div class="row" id="toolbar">
 		<div class="button-group">
 			<input id="fast-create" class="btn btn-primary" type="button" name="some_name" value="Добавить">
 			<input id="edit"class="btn btn-primary"  type="button" name="some_name" value="Обновить">
@@ -41,6 +40,7 @@
 		</div>
 		<a href="#" class="right popup-close">&times;</a>
 	</div>
+	<br>
 
 	<div class="row">
 		<fieldset class="col12">
@@ -48,15 +48,17 @@
 			<input id="ititle" type="text" name="event" value="" placeholder="Событие">
 			<input id="ipeople" type="text" name="people" value="" placeholder="Участники">
 		</fieldset>
-		<div id="people" class="toggle" data-target="people">
+		<div id="people" class="toggle col12" data-target="people">
 			<h3 class="secondary"> Участники: </h3>
 			<p id="l-people"></p>
 		</div>
 	</div>
+	<br>
+	<br>
 
 	<div class="row">
-		<textarea id="idesc" placeholder="Описание" rows=10 cols=50></textarea>
-		<div id="desc" class="col toggle" data-target="desc">
+		<textarea id="idesc" placeholder="Описание" rows=10 cols=50 class="col12"></textarea>
+		<div id="desc" class="col12 toggle" data-target="desc">
 			<h3 class="secondary"> Описание: </h3>
 			<p id="l-desc"></p>
 		</div>
