@@ -4,6 +4,8 @@
 	<script src="./jquery.js"></script>
 	<script src="./calendar.js" lang="us" charset="utf8"></script>
 	<link rel="stylesheet" type="text/css" href="index.css">
+	<link rel="stylesheet" type="text/css" href="grid.css">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
 	<title>Calendar</title>
 </head>
 <body>
@@ -19,12 +21,13 @@
 		</div>
 	</div>
 </div>
+
 <div class="body">
-	<div class="calendar-control">
-	<input id="prev-month" type="button" name="next" value="<">
+	<div id="calendar-control">
+	<input id="prev-month" class="btn btn-default" type="button" name="next" value="<">
 	<span id="month"></span>
-	<input id="next-month" type="button" name="prev" value=">">
-	<input id="today-button" type="button" name="today" value="Сегодня">
+	<input id="next-month" class="btn btn-default" type="button" name="prev" value=">">
+	<input id="today-button" class="btn btn-default" type="button" name="today" value="Сегодня">
 	</div>
 	<table id="calendar">
 	</table>
@@ -33,38 +36,37 @@
 <div id="day-popup" class="popup popup-right">
 
 	<div class="row">
-		<a href="#" class="popup-close right">&times;</a>
-		<div id="title" class="toggle" data-target="title">
-			<h3 id="l-title" class="left"> </h3>
+		<div id="title" class="col8 toggle" data-target="title">
+			<h3 id="l-title"> </h3>
 		</div>
+		<a href="#" class="right popup-close">&times;</a>
 	</div>
-	
+
 	<div class="row">
-		<p id="date"> </p>
-		<fieldset class="col">
+		<fieldset class="col12">
+			<p id="date"> </p>
 			<input id="ititle" type="text" name="event" value="" placeholder="Событие">
 			<input id="ipeople" type="text" name="people" value="" placeholder="Участники">
 		</fieldset>
-		<div id="people" class="col toggle" data-target="people">
+		<div id="people" class="toggle" data-target="people">
 			<h3 class="secondary"> Участники: </h3>
 			<p id="l-people"></p>
 		</div>
 	</div>
 
-	<br>
-
 	<div class="row">
 		<textarea id="idesc" placeholder="Описание" rows=10 cols=50></textarea>
 		<div id="desc" class="col toggle" data-target="desc">
-			<!--<a class="undecor" href="#" data-target="desc">  </a>-->
 			<h3 class="secondary"> Описание: </h3>
 			<p id="l-desc"></p>
 		</div>
 	</div>
 
-	<div class="row">
-		<input id="done" type="button" name="done" value="Готово">
-		<input id="remove" type="button" name="remove" value="Удалить" disabled="true" >
+	<br>
+
+	<div class="row button-group">
+		<input id="done" class="btn btn-default" type="button" name="done" value="Готово">
+		<input id="remove" class="btn btn-default" type="button" name="remove" value="Удалить" disabled="true" >
 	</div>
 </div>
 
@@ -78,7 +80,7 @@
 		<h3 class="left"> Добавить событие </h3>
 	</div>
 	<input id="fast-create-text" type="text" name="some_name" value="" placeholder="Дата, название...">
-	<input id="fast-create-submit"type="button" name="submit" value="Создать" disabled="true">
+	<input id="fast-create-submit" class="btn btn-default" type="button" name="submit" value="Создать" disabled="true">
 </div>
 
 
