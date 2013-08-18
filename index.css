@@ -7,25 +7,28 @@
 }
 .body{
 	overflow: auto;
-	clear: both; }
+	clear: both; 
+}
+
 #calendar{
 	position: absolute;
 	left: 50%;
-	/*margin: 0 auto;*/
 	margin-left: -490px;//140*7/2 - 6
+	border-spacing: 0px;
 	border-collapse: collapse;
 }
-#calendar > tbody > tr > td{
+
+#calendar > tbody td{
 	margin: 0px;
 	padding: 0px;
-	border: 1px solid grey;
+	border: 1px solid gray;
 }
 .day{
 	text-align: left;
 	width: 140px;
 	height: 140px;
 	overflow: hidden;
-	padding: 4px;
+	padding: -1px;
 	vertical-align: top;
 	padding: 3px;
 	margin: 0px;
