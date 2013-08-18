@@ -198,6 +198,7 @@ function fill_calendar(d){
 }
 
 function incMonth () {
+	popupClose($(".popup"));
 	if ($month == 11) {
 		$year++;
 		$month = 0;
@@ -207,6 +208,7 @@ function incMonth () {
 }
 
 function decMonth () {
+	popupClose($(".popup"));
 	if ($month == 0) {
 		$year--;
 		$month = 11;
